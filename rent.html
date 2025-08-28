@@ -1,0 +1,166 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ title }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/rent.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background">
+  <div class="container">
+    {% if messages %}
+      {% for message in messages %}
+        <p class="
+          {% if 'success' in message.tags %}message
+          {% elif 'error' in message.tags %}error-msg
+          {% else %}info-msg
+          {% endif %}
+        ">
+          {{ message }}
+        </p>
+      {% endfor %}
+    {% endif %}
+    <form method="post">
+        <h1>Орендувати кімнату</h1>
+        {% csrf_token %}  
+    
+        <label>Ваше ім'я:
+            <input type="text" value="{{ user.username }}" readonly>
+        </label>  
+      
+        <p style="margin: 0; font-weight: bold;">Ціна за день:
+            <span id="daily_price_display">{{ room.price }}</span> грн
+        </p>
+        <br>  
+      
+        <label>Дата початку зайнятості:
+            <input type="date" name="first_data" id="start_date" value="{{ tomorrow }}" min="{{ tomorrow }}" required>
+        </label>  
+      
+        <label>Дата завершення зайнятості:
+            <input type="date" name="last_data" id="end_date" value="{{ tomorrow }}" min="{{ tomorrow }}" required>
+        </label>  
+      
+        <label>Загальна ціна:
+            <span id="total_price_display" style="font-weight: bold;"></span>
+        </label>         
+
+        <label>Ваш баланс: <strong id="wallet_balance">{{ user.wallet }}</strong> грн</label>
+        <p id="balance_remaining" style="font-weight: bold; margin-top: 5px;"></p>
+        <p id="balance_warning" style="color: red; font-weight: bold; display: none;">
+          Недостатньо коштів для оренди
+        </p>
+        
+
+        <br><br>
+        <button type="submit">Орендувати</button>
+
+    </form>
+  </div>
+</div>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥
+  <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span>
+  🔥
+</div>
+
+<script>
+    function redirectToMenu() {
+        window.location.href = "/menu/{{ user.id }}";
+    }
+</script>
+
+<script>
+  const startDateInput = document.getElementById('start_date');
+  const endDateInput = document.getElementById('end_date');
+  const dailyPrice = parseFloat(document.getElementById('daily_price_display').textContent);
+  const totalPriceDisplay = document.getElementById('total_price_display');
+  const walletBalance = parseFloat(document.getElementById('wallet_balance').textContent);
+  const balanceWarning = document.getElementById('balance_warning');
+  const balanceRemainingElem = document.getElementById('balance_remaining');
+  const rentButton = document.querySelector('button[type="submit"]');
+
+  function getDayWord(days) {
+    if (days === 1) return 'день';
+    if (days >= 2 && days <= 4) return 'дні';
+    return 'днів';
+  }
+
+  function updateTotalPrice() {
+    const start = new Date(startDateInput.value);
+    const end = new Date(endDateInput.value);
+
+    if (!isNaN(start) && !isNaN(end) && end >= start) {
+      const diffTime = end - start;
+      const days = Math.floor(diffTime / (1000 * 60 * 60 * 24)) + 1;
+      const total = days * dailyPrice;
+      const dayWord = getDayWord(days);
+      totalPriceDisplay.textContent = `${total} грн за ${days} ${dayWord}`;
+
+      const balanceRemaining = walletBalance - total;
+      if (balanceRemaining >= 0) {
+        balanceRemainingElem.textContent = `Залишок після оренди: ${balanceRemaining.toFixed(2)} грн`;
+        balanceWarning.style.display = 'none';
+        rentButton.disabled = false;
+        rentButton.style.backgroundColor = '#007bff';
+        rentButton.style.cursor = 'pointer';
+      } else {
+        balanceRemainingElem.textContent = '';
+        balanceWarning.style.display = 'block';
+        rentButton.disabled = true;
+        rentButton.style.backgroundColor = '#ccc';
+        rentButton.style.cursor = 'not-allowed';
+      }
+    } else {
+      totalPriceDisplay.textContent = '';
+      balanceRemainingElem.textContent = '';
+      balanceWarning.style.display = 'none';
+      rentButton.disabled = true;
+      rentButton.style.backgroundColor = '#ccc';
+      rentButton.style.cursor = 'not-allowed';
+    }
+  }
+
+  startDateInput.addEventListener('change', updateTotalPrice);
+  endDateInput.addEventListener('change', updateTotalPrice);
+
+  document.addEventListener('DOMContentLoaded', updateTotalPrice);
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+
+{% endblock %}

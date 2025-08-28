@@ -1,0 +1,257 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    background-attachment: fixed;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden;
+}
+
+html.dark-theme body, html {
+    background: linear-gradient(135deg, #243B55);
+    color: #fff;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 100%;       /* ширина по умолчанию, 95% от родителя */
+    max-width: 500px; /* максимальная ширина контейнера */
+    min-width: 300px;  /* минимальная ширина, чтобы контент не сжимался */
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+
+html.dark-theme .container {
+    background-color: #000 !important;
+    color: white !important;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+li a {
+    flex-grow: 1;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-photo {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-left: 15px;
+    border-radius: 8px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+.username-display {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.username-display a {
+    color: #000;
+    text-decoration: none;
+}
+
+html.dark-theme .username-display a {
+    color: #fff;
+}
+
+button[type="submit"] {
+    background-color: #00aaff;
+    color: white;
+    border: none;
+    padding: 6px 12px;      /* уменьшенные отступы */
+    border-radius: 15px;    /* чуть меньше закругление */
+    cursor: pointer;
+    font-size: 14px;        /* уменьшенный шрифт */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+html.dark-theme button[type="submit"] {
+    background-color: #025680;
+    color: white;
+    border: none;
+    padding: 6px 12px;      /* уменьшенные отступы */
+    border-radius: 15px;    /* чуть меньше закругление */
+    cursor: pointer;
+    font-size: 14px;        /* уменьшенный шрифт */
+    font-weight: bold;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+/* Кнопка "Меню" */
+.styled-button {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #00caf3, #66b2ed);
+    color: #5f2eea;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+    margin-top: 6px;
+}
+
+.switch {
+    font-size: 17px;
+    display: inline-block;
+    width: 3.5em;
+    height: 2em;
+    position: relative;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    --background: #28096b;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background);
+    transition: .5s;
+    border-radius: 30px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 1.4em;
+    width: 1.4em;
+    border-radius: 50%;
+    left: 10%;
+    bottom: 15%;
+    box-shadow: inset 8px -4px 0px 0px #fff000;
+    background: var(--background);
+    transition: .5s;
+}
+
+input:checked + .slider {
+    background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+    transform: translateX(100%);
+    box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+
+.container input,
+.container select,
+.container textarea {
+    background-color: #fdfdfd;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.container input::placeholder,
+.container textarea::placeholder {
+    color: #666;
+}
+
+.container input:focus,
+.container textarea:focus {
+    background-color: #fff;
+    border-color: #888;
+    outline: none;
+    color: #000;
+}
+
+.container button.btn {
+    background-color: #00aaff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.container button.btn:hover {
+    background-color: #008fcc;
+}
+
+html.dark-theme .white-text {
+    color: white !important;
+}

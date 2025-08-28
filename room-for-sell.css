@@ -1,0 +1,341 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+  color: #000;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-theme {
+  background: linear-gradient(135deg, #000000, #0d1a33);
+  color: white;
+}
+
+.username-display {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.username-display a {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+  margin-top: 6px;
+}
+.switch {
+  font-size: 17px;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+  position: relative;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  --background: #28096b;
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--background);
+  transition: .5s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 50%;
+  left: 10%;
+  bottom: 15%;
+  box-shadow: inset 8px -4px 0px 0px #fff000;
+  background: var(--background);
+  transition: .5s;
+}
+
+input:checked + .slider {
+  background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+  box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+
+/* */
+.menu-button-wrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+.styled-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #00caf3, #66b2ed);
+  color: #5f2eea;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button span {
+  color: #6a5acd;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+.styled-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.container {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.container input,
+.container select,
+.container textarea {
+  background-color: #fdfdfd;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 14px;
+}
+
+.container input::placeholder,
+.container textarea::placeholder {
+  color: #666;
+}
+
+.container input:focus,
+.container textarea:focus {
+  background-color: #fff;
+  border-color: #888;
+  outline: none;
+  color: #000;
+}
+
+.container button.btn {
+  background-color: #00aaff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.container button.btn:hover {
+  background-color: #008fcc;
+}
+
+/* Тёмная тема */
+html.dark-theme {
+  background: linear-gradient(135deg, #141E30, #243B55);
+  color: white;
+}
+
+html.dark-theme body {
+  background: transparent;
+  color: white;
+}
+
+html.dark-theme .username-display a {
+  color: white;
+}
+
+html.dark-theme .rooms-wiew {
+  color: white;
+}
+
+html.dark-theme .rooms-wiew a {
+  color: white;
+}
+
+/* Тёмная тема - container и форма */
+html.dark-theme .container {
+  background-color: #121212;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+html.dark-theme .container input,
+html.dark-theme .container select,
+html.dark-theme .container textarea {
+  background-color: #222;
+  color: white;
+  /* border: 1px solid #555; */
+  /* border-radius: 6px; */
+  /* padding: 8px 10px; */
+  /* font-size: 14px; */
+}
+
+html.dark-theme .container input::placeholder,
+html.dark-theme .container textarea::placeholder {
+  color: #bbb;
+}
+
+html.dark-theme .container input:focus,
+html.dark-theme .container textarea:focus {
+  background-color: #333;
+  border-color: #888;
+  /* outline: none; */
+  color: white;
+}
+
+html.dark-theme .container button.btn {
+  background-color: #522ba7;
+  color: white;
+  /* border: none; */
+  /* padding: 10px 20px; */
+  /* border-radius: 20px; */
+  /* cursor: pointer; */
+  /* font-size: 16px; */
+  /* font-weight: bold; */
+}
+
+html.dark-theme .container button.btn:hover {
+  background-color: #6a40d1;
+}
+
+.background {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4facfe;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #00f2fe;
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.register-button {
+    display: inline-block;
+    margin-top: 5px;
+    background-color: transparent;
+    border: 2px solid #4facfe;
+    color: #4facfe;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: #4facfe;
+    color: white;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+.button-link:hover {
+    background-color: #0056b3;
+}
+.readonly-field {
+    padding: 5px 10px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.message {
+    color: green;
+    font-weight: bold;
+}
+
+.error-msg {
+    color: red;
+    font-weight: bold;
+}

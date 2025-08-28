@@ -1,0 +1,88 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Інформація про бронювання</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'css/booking.css' %}">
+
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="container">
+    <h1>{{ title }}</h1>
+    <ul style="list-style:none; padding:0;">
+      {% for reservation in rooms %}
+        <li style="margin-bottom:10px; display:flex; justify-content: space-between; align-items:center; max-width:600px; border-bottom:1px solid #ccc; padding-bottom:8px;">
+          <a href="{% url 'room-info' room_id=reservation.room.id %}" style="flex-grow:1; text-decoration:none; color:inherit; font-weight:bold; display:flex; flex-direction: column; gap:4px;">
+            <span class="white-text">{{ reservation.title }}</span>
+            <span class="white-text" style="font-weight: normal;">Адреса: {{ reservation.address }}</span>
+            <span class="white-text" style="font-weight: normal;">Ціна за день: {{ reservation.price|floatformat:"0" }} грн</span>
+            <span class="white-text" style="font-weight: normal;">Заброньовано з {{ reservation.start_date }} по {{ reservation.end_date }}</span>
+            <span class="white-text" style="font-weight: normal;">Загальна ціна: {{ reservation.total_price|floatformat:"0" }} грн</span>
+            <span class="white-text" style="font-weight: normal;">Телефон: {{ reservation.phone_number }}</span>
+          </a>
+          {% if reservation.photo %}
+            <img 
+              src="{{ reservation.photo.url }}" 
+              alt="Фото кімнати" 
+              style="width: 80px; height: 80px; object-fit: cover; margin-left: 15px; border-radius: 8px;"
+            >
+          {% endif %}
+      
+          <form method="post" action="{% url 'cancel_reservation' reservation.id %}" style="margin:0 0 0 15px;">
+              {% csrf_token %}
+              <button type="submit" style="background:none; border:none; color:rgb(206, 199, 65); cursor:pointer;">Отмена</button>
+          </form>
+        </li>
+      {% empty %}
+        <li>Бронювання немає</li>
+      {% endfor %}
+    </ul>
+</div>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥
+  <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span>
+  🔥
+</div>
+
+<script>
+    function redirectToMenu() {
+        window.location.href = "/menu/{{ user.id }}";
+    }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,211 @@
+  .username-display {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    color: #333;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+  } 
+
+  .username-display a {
+    color: #000;
+    text-decoration: none;
+  }
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    background: linear-gradient(135deg, #74ebd5, #ACB6E5);
+    font-family: Arial, sans-serif;
+}
+
+body {
+  background: transparent; /* Убираем фон у body */
+}
+
+html.dark-theme {
+  background: linear-gradient(135deg, #141E30, #243B55); /* Темный фон */
+  color: white;
+}
+
+html.dark-theme body {
+  color: white;
+}
+
+/* Стили для тёмной темы кнопок */
+html.dark-theme .vertical-menu button {
+  background-color: #333;
+  color: white;
+  border: 1px solid #555;
+}
+
+html.dark-theme .username-display a {
+  color: #fff;
+}
+
+html.dark-theme .container {
+  background-color: #121212;
+  color: #fff;
+}
+
+
+.background {
+    display: flex;
+    justify-content: flex-start;
+    align-items: flex-start;    
+    padding: 40px;              
+    min-height: 100vh;          
+}
+
+.container {
+    background-color: white;
+    padding: 30px 40px;
+    border-radius: 12px;
+    box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 900px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #007bff;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #00f2fe;
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.styled-button {
+  position: fixed;
+  left: 10px;     
+  bottom: 10px;   
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #00caf3, #66b2ed);
+  color: #5f2eea;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.styled-button span {
+  color: #8b5cf6;
+  text-decoration: underline;
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+  margin-top: 6px;
+}
+
+.switch {
+  font-size: 17px;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+  position: relative;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  --background: #28096b;
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--background);
+  transition: .5s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 50%;
+  left: 10%;
+  bottom: 15%;
+  box-shadow: inset 8px -4px 0px 0px #fff000;
+  background: var(--background);
+  transition: .5s;
+}
+
+input:checked + .slider {
+  background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+  box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+
+.message {
+color: green;
+font-weight: bold;
+}
+.error-msg {
+    color: red;
+    font-weight: bold;
+}

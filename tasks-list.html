@@ -1,0 +1,379 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ title }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/rooms_list.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+    {% if user.username %}
+        <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+        <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+    {% else %}
+        👤 Ви не увійшли в акаунт<br>
+        <a href="/login" class="login-link">Увійти</a>
+    {% endif %}
+    <div class="switch-wrapper">
+        <label class="switch" title="Перемкнути тему">
+            <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</div>
+
+<div class="container">
+    <h1>{{ title }}</h1>
+
+    <form id="filter-form" style="margin-bottom:20px;">
+        <label>Приоритет:
+            <select name="priority">
+                <option value="">Всі</option>
+                <option value="low" {% if request.GET.priority == 'low' %}selected{% endif %}>Low</option>
+                <option value="medium" {% if request.GET.priority == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="high" {% if request.GET.priority == 'high' %}selected{% endif %}>High</option>
+            </select>
+        </label>
+        <br>
+        <label>Активність:
+            <select name="activity_status">
+                <option value="">Всі</option>
+                <option value="active" {% if activity_status == 'active' %}selected{% endif %}>Активно</option>
+                <option value="inactive" {% if activity_status == 'inactive' %}selected{% endif %}>Неактивно</option>
+            </select>
+        </label>
+        <br>
+        <label>Статус завдання:
+            <select name="task_status">
+                <option value="">Всі</option>
+                <option value="active" {% if task_status == 'active' %}selected{% endif %}>Відкрито</option>
+                <option value="inactive" {% if task_status == 'inactive' %}selected{% endif %}>Приховати</option>
+            </select>
+        </label>
+        <br>
+        <label>Підписка:
+            <select name="subscription">
+                <option value="">Всі</option>
+                <option value="Не потрібна" {% if request.GET.subscription == 'Не потрібна' %}selected{% endif %}>Не потрібна</option>
+                <option value="Потрібна" {% if request.GET.subscription == 'Потрібна' %}selected{% endif %}>Потрібна</option>
+            </select>
+        </label>
+        <br>
+        <button type="submit">Фільтрувати</button>
+    </form>
+
+    <ul style="list-style:none; padding:0;">
+        {% for task in tasks %}
+            <li style="margin-bottom:10px; display:flex; justify-content: space-between; align-items:center; max-width:600px; border-bottom:1px solid #ccc; padding-bottom:8px;">
+                <a href="{% url 'update_task' task.owner.id task.id %}" 
+                    style="flex-grow:1; text-decoration:none; color:#333; font-weight:bold; display:flex; flex-direction: column; gap:4px;">
+                    <span class="white-text">{{ task.title }}</span>
+                    <span class="white-text" style="font-weight: normal;">Пріоритет: {{ task.priority }}</span>
+                    <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span style="white-space: nowrap;">Термін виконання:</span>
+                        <input type="datetime-local" 
+                            value="{{ task.deadline|date:'Y-m-d\\TH:i' }}" 
+                            readonly 
+                            class="white-text" 
+                            style="font-weight: normal; border:none; background:transparent; text-align: right;">
+                    </div>
+
+                    {% if task.deadline < now %}
+                        <span class="white-text" style="font-weight: normal; color: red">Неактивно</span>
+                    {% else %}
+                        <span class="white-text" style="font-weight: normal; color: green">Активно</span>
+                    {% endif %}
+
+                    {% if task.status == 'inactive' %}
+                        <span class="white-text" style="font-weight: normal; color: red">Приховано</span>
+                    {% else %}
+                        <span class="white-text" style="font-weight: normal; color: green">Відкрито</span>
+                    {% endif %}
+
+                    {% if task.subscription == 'Потрібна' %}
+                        <span class="white-text" style="font-weight: normal; color: rgb(255, 0, 0)">Підписка</span>
+                    {% endif %}
+                </a>
+
+                {% if task.photo %}
+                    <img src="{{ task.photo.url }}" 
+                         alt="Фото завдання" 
+                         style="width: 80px; height: 80px; object-fit: cover; margin-left: 15px; border-radius: 8px;">
+                {% endif %}
+
+                <form method="post" action="{% url 'delete_taks_list' task.id %}" style="margin:0 0 0 15px;">
+                    {% csrf_token %}
+                    <input type="hidden" name="task_id" value="{{ task.id }}">
+                    <!-- <button type="submit" style="background:none; border:none; color:red; cursor:pointer;">Видалити</button> -->
+                    <button type="submit" class="delete-btn" style="background:none; border:none; color:red; cursor:pointer;"
+                            onclick="return confirm('Ви точно хочете видалити завдання?')">Видалити</button>
+                </form>
+            </li>
+        {% empty %}
+            <li>Завдань немає</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥 <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span> 🔥
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    background: linear-gradient(135deg, #0000ff, #ACB6E5);
+    background-attachment: fixed;
+    color: #000;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow: hidden; 
+}
+
+html.dark-theme {
+    background: linear-gradient(135deg, #243B55);
+    color: white;
+}
+
+.container {
+    display: flex;
+    flex-direction: column;
+    width: 95%;         
+    max-width: 1000px;  
+    background-color: #fff;
+    padding: 20px 30px;
+    border-radius: 15px;
+    box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    margin-top: 20px;
+
+    max-height: 90vh;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+
+html.dark-theme .container {
+    background-color: #000 !important;
+    color: white !important;
+}
+
+ul {
+    list-style: none;
+    padding: 0;
+    margin-top: 20px;
+}
+
+li {
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    border-bottom: 1px solid #ddd;
+    padding-bottom: 8px;
+}
+
+li a {
+    flex-grow: 1;
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+}
+
+.task-photo {
+    width: 80px;
+    height: 80px;
+    object-fit: cover;
+    margin-left: 15px;
+    border-radius: 8px;
+}
+
+.delete-btn {
+    background: none;
+    border: none;
+    color: red;
+    cursor: pointer;
+    margin-left: 15px;
+}
+
+/* Username */
+.username-display {
+    position: absolute;
+    top: 10px;
+    right: 20px;
+    font-weight: bold;
+    font-size: 16px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+}
+
+.username-display a {
+    color: #000;
+    text-decoration: none;
+}
+
+html.dark-theme .username-display a {
+    color: #fff;
+}
+
+/* Кнопка "Меню" */
+.styled-button {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #00caf3, #66b2ed);
+    color: #5f2eea;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+    margin-top: 6px;
+}
+
+.switch {
+    font-size: 17px;
+    display: inline-block;
+    width: 3.5em;
+    height: 2em;
+    position: relative;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    --background: #28096b;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background);
+    transition: .5s;
+    border-radius: 30px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 1.4em;
+    width: 1.4em;
+    border-radius: 50%;
+    left: 10%;
+    bottom: 15%;
+    box-shadow: inset 8px -4px 0px 0px #fff000;
+    background: var(--background);
+    transition: .5s;
+}
+
+input:checked + .slider {
+    background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+    transform: translateX(100%);
+    box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+
+.container input,
+.container select,
+.container textarea {
+    background-color: #fdfdfd;
+    color: #000;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    padding: 8px 10px;
+    font-size: 14px;
+}
+
+.container input::placeholder,
+.container textarea::placeholder {
+    color: #666;
+}
+
+.container input:focus,
+.container textarea:focus {
+    background-color: #fff;
+    border-color: #888;
+    outline: none;
+    color: #000;
+}
+
+.container button.btn {
+    background-color: #00aaff;
+    color: white;
+    border: none;
+    padding: 10px 20px;
+    border-radius: 20px;
+    cursor: pointer;
+    font-size: 16px;
+    font-weight: bold;
+}
+
+.container button.btn:hover {
+    background-color: #008fcc;
+}
+
+html.dark-theme .white-text {
+    color: white !important;
+}
+</style>
+
+<script>
+function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+}
+
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+        html.classList.add("dark-theme");
+        toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+        html.classList.toggle("dark-theme", this.checked);
+        localStorage.setItem("darkTheme", this.checked);
+    });
+});
+</script>
+{% endblock %}

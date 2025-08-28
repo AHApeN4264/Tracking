@@ -1,0 +1,84 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+<title>Меню</title>
+<link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+<link rel="stylesheet" href="{% static 'css/menu2.css' %}">
+<link rel="stylesheet" href="{% static 'css/switch.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    <a href="/login" class="login-link">👤 Ви не увійшли в акаунт</a>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+
+<header>
+  {% if is_admin %}
+    <a href="/admin" class="admin-button">Адмін панель</a>
+  {% endif %}
+</header>
+
+{% if messages %}
+  {% for message in messages %}
+    <p class="{% if 'success' in message.tags %}message{% elif 'error' in message.tags %}error-msg{% else %}info-msg{% endif %}">
+      {{ message }}
+    </p>
+  {% endfor %}
+{% endif %}
+
+<div class="vertical-menu">
+  {% if user.username %}
+    <button onclick="location.href='/task-create/{{ user.id }}'">Створити завдання</button>
+    <button onclick="location.href='/tasks-list/{{ user.id }}'">Оновити завдання</button>
+  {% else %}
+    <button onclick="location.href='/error-continued'">Створити завдання</button>
+    <button onclick="location.href='/error-continued'">Оновити завдання</button>
+  {% endif %}
+  <button onclick="location.href='/all-tasks-views'">Усі завдання</button>
+</div>
+
+<style>
+html{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #0009b3, #00ac3c);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+{% endblock %}

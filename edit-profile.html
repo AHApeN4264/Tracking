@@ -1,0 +1,639 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ title }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <!-- <link rel="stylesheet" href="{% static 'css/user-profile.css' %}"> -->
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+    {% if user.username %}
+        <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+        <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+    {% else %}
+        👤 Ви не увійшли в акаунт<br>
+        <a href="/login" class="login-link">Увійти</a>
+    {% endif %}
+    <div class="switch-wrapper">
+        <label class="switch" title="Перемкнути тему">
+            <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+            <span class="slider"></span>
+        </label>
+    </div>
+</div>
+
+<div class="container" style="position: relative; z-index: 1;">
+  {% if messages %}
+    {% for message in messages %}
+      <p class="{% if 'success' in message.tags %}message{% elif 'error' in message.tags %}error-msg{% else %}info-msg{% endif %}">
+        {{ message }}
+      </p>
+    {% endfor %}
+  {% endif %}
+  <h1>{{ userprofile.user.username }}</h1>
+
+  <form method="POST" enctype="multipart/form-data">
+    {% csrf_token %}
+
+    <!-- Аватарка -->
+    <label>Аватарка:
+      <input type="file" id="avatarInput" name="photo" accept="image/*">
+    </label>
+    <br>
+    <!-- Предпросмотр аватарки -->
+    <img id="avatarPreview" 
+         src="{% if userprofile.photo %}{{ userprofile.photo.url }}{% else %}{{ MEDIA_URL }}photos/login.png{% endif %}" 
+         style="width:150px; height:150px; border-radius:50%; margin-top:10px;" 
+         alt="Аватарка">
+    <br>
+
+    <!-- Сброс аватарки -->
+    <button type="submit" name="action" value="reset_photo" class="btn">Убрати аватарку</button>
+    <br><br>
+
+  <!-- Фон -->
+  Фон:
+  {% if user.subscription != 'Підписка' %}
+    <span class="white-text" style="font-weight: normal; color: rgb(255, 0, 0)">(Потрібна підписка)</span>
+  {% elif user.subscription != 'Нема підписки' %}
+    <label>
+    <input type="file" name="background" accept="image/*" id="backgroundInput">
+  </label>
+  {% endif %}
+  <br>
+  
+  Виберить фон из готових:
+  {% if user.subscription != 'Підписка' %}
+    <span class="white-text" style="font-weight: normal; color: rgb(255, 0, 0)">(Потрібна підписка)</span>
+  {% elif user.subscription != 'Нема підписки' %}
+  <button type="button" id="select_background">Вибрати фон</button>
+  {% endif %}
+
+  <!-- окно выбора фона -->
+  <div id="backgroundModal" class="modal">
+    <div class="modal-content">
+      <span class="close">&times;</span>
+      <h3>Виберіть фон</h3>
+      <div class="background-options">
+      <img src="{% static 'pictures/background1.jfif' %}" alt="Background 1" class="bg-thumb">
+      <img src="{% static 'pictures/background2.jfif' %}" alt="Background 2" class="bg-thumb">
+      <img src="{% static 'pictures/background3.jpg' %}" alt="Background 3" class="bg-thumb">
+      </div>
+    </div>
+  </div>
+  {% if userprofile.background or userprofile.background_url %}
+  <img id="backgroundPreview" 
+       src="{% if userprofile.background %}{{ userprofile.background.url }}{% else %}{{ userprofile.background_url }}{% endif %}" 
+       style="
+           position: absolute;
+           top: 10px; 
+           left: 10px; 
+           width: 1500px;   
+           height: 650px;  
+           object-fit: cover; 
+           z-index: -1; 
+           border-radius: 12px;
+       " 
+       alt="Фон">
+  {% endif %}
+  <!-- Сброс фона -->
+  <br>
+  <button type="submit" name="action" value="reset_background" class="btn">Убрати фон</button>
+  <br>
+
+  <input type="hidden" id="selectedBackgroundInput" name="selected_background" value="">
+    <br>
+    <!-- Описание -->
+    <label>Описання:</label><br>
+    <textarea name="description" rows="4" cols="40">{{ userprofile.description }}</textarea>
+    <br><br>
+
+      <!-- Сохранить все изменения -->
+      <button type="submit" name="action" value="save" class="btn">Зберегти зміни</button>
+  </form>
+
+
+  <!-- Превью выбранного фото -->
+  <p>Зроблено цим розробником:</p>
+  <div class="container1">
+    <ul style="list-style:none; padding:0;">
+        {% for task in user_tasks  %}
+            <li style="margin-bottom:10px; display:flex; justify-content: space-between; align-items:center; max-width:600px; border-bottom:1px solid #ccc; padding-bottom:8px;">
+                <a href="{% url 'update_task' task.owner.id task.id %}" 
+                   style="flex-grow:1; text-decoration:none; color:#333; font-weight:bold; display:flex; flex-direction: column; gap:4px;">
+                    <span class="white-text">{{ task.title }}</span>
+                    <span class="white-text" style="font-weight: normal;">Пріоритет: {{ task.priority }}</span>
+                    <div class="white-text" style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                        <span style="white-space: nowrap;">Термін виконання: {{ task.deadline|date:'Y-m-d\\ H:i' }}</span>
+                        <input
+                            readonly 
+                            class="white-text" 
+                            style="font-weight: normal; border:none; background:transparent; text-align: right;">
+                    </div>
+                    {% if task.deadline >= now %}
+                      <span style="color: green">Активно</span>
+                    {% else %}
+                      <span style="color: red">Неактивно</span>
+                    {% endif %}
+                    {% if task.status == 'inactive' %}
+                        <span class="white-text" style="font-weight: normal; color: red">Приховано</span>
+                    {% else %}
+                        <span class="white-text" style="font-weight: normal; color: green">Відкрито</span>
+                    {% endif %}
+                    {% if task.subscription == 'Потрібна' %}
+                        <span class="white-text" style="font-weight: normal; color: rgb(255, 0, 0)">Підписка</span>
+                    {% endif %}
+                </a>
+
+                {% if task.photo %}
+                    <img src="{{ task.photo.url }}" 
+                         alt="Фото завдання" 
+                         style="width: 80px; height: 80px; object-fit: cover; margin-left: 15px; border-radius: 8px;">
+                {% endif %}
+            </li>
+        {% empty %}
+            <li>Завдань немає</li>
+        {% endfor %}
+    </ul>
+  </div>
+</div>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥 <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span> 🔥
+</div>
+
+<style>
+.container1 {
+  background-color: rgb(237, 237, 237);
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 30%;
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+html.dark-theme .container1 {
+    background-color: rgb(78, 78, 78);
+}
+
+.white-text {
+  color: #000;
+  transition: color 0.3s ease;
+}
+
+html.dark-theme .white-text {
+  color: #d0d0d0;
+}
+
+textarea {
+    color: #000;
+    background-color: #fff; 
+}
+
+textarea::placeholder {
+    color: #000;
+    opacity: 1;  
+}
+
+html.dark-theme textarea {
+    color: #fff; 
+    background-color: #333;
+}
+
+html.dark-theme textarea::placeholder {
+    color: #fff; 
+    opacity: 1;
+}
+
+/* коментарии */
+.comment-block {
+  background-color: #FFF0F5; 
+  border: 1px solid #FF69B4; 
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  color: #4B0082;
+}
+
+.comment-block strong {
+  color: #C71585; 
+}
+
+.comment-block .delete-btn {
+  background: none;
+  border: none;
+  color: #FF4500; 
+  cursor: pointer;
+}
+
+.comment-block .delete-btn:hover {
+  text-decoration: underline;
+}
+
+html.dark-theme .comment-block {
+  background-color: #a67777; 
+  border: 1px solid #97446e; 
+  border-radius: 8px;
+  padding: 10px 15px;
+  margin-bottom: 10px;
+  color: #4B0082;
+}
+
+html.dark-theme .comment-block strong {
+  color: #822761; 
+}
+
+html.dark-theme .comment-block .delete-btn {
+  background: none;
+  border: none;
+  color: #af4822; 
+  cursor: pointer;
+}
+
+.tasks-description {
+  resize: vertical; 
+  overflow: auto;   
+  min-height: 100px;
+  max-height: 500px;
+  width: 100%;      
+  box-sizing: border-box;
+}
+
+.container {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  max-width: 1500px;      
+  width: 100%;
+  min-height: 600px;      
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Фон */
+/* Модальное окно для выбора фона */
+.modal {
+  display: none; 
+  position: fixed; 
+  z-index: 2000; 
+  left: 0;
+  top: 0;
+  width: 100%; 
+  height: 100%; 
+  background-color: rgba(0,0,0,0.5);
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background-color: #fff;
+  border-radius: 8px;
+  padding: 20px;
+  text-align: center;
+  max-width: 500px;
+  width: 90%;
+  position: relative;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 15px;
+  font-size: 20px;
+  cursor: pointer;
+}
+
+.background-options {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 15px;
+}
+
+.bg-thumb {
+  width: 140px;
+  height: 100px;
+  object-fit: cover;
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  transition: border 0.3s;
+}
+
+.bg-thumb:hover {
+  border: 2px solid #007bff;
+}
+/* Рейтинг */
+/* From Uiverse.io by SelfMadeSystem */ 
+.rating {
+  display: flex;
+  flex-direction: row-reverse;
+  gap: 0.3rem;
+  --stroke: #666;
+  --fill: #ffc73a;
+}
+
+.rating input {
+  appearance: unset;
+}
+
+.rating label {
+  cursor: pointer;
+}
+
+.rating svg {
+  width: 2rem;
+  height: 2rem;
+  overflow: visible;
+  fill: transparent;
+  stroke: var(--stroke);
+  stroke-linejoin: bevel;
+  stroke-dasharray: 12;
+  animation: idle 4s linear infinite;
+  transition: stroke 0.2s, fill 0.5s;
+}
+
+@keyframes idle {
+  from {
+    stroke-dashoffset: 24;
+  }
+}
+
+.rating label:hover svg {
+  stroke: var(--fill);
+}
+
+.rating input:checked ~ label svg {
+  transition: 0s;
+  animation: idle 4s linear infinite, yippee 0.75s backwards;
+  fill: var(--fill);
+  stroke: var(--fill);
+  stroke-opacity: 0;
+  stroke-dasharray: 0;
+  stroke-linejoin: miter;
+  stroke-width: 8px;
+}
+
+@keyframes yippee {
+  0% {
+    transform: scale(1);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30% {
+    transform: scale(0);
+    fill: var(--fill);
+    fill-opacity: 0;
+    stroke-opacity: 1;
+    stroke: var(--stroke);
+    stroke-dasharray: 10;
+    stroke-width: 1px;
+    stroke-linejoin: bevel;
+  }
+
+  30.1% {
+    stroke: var(--fill);
+    stroke-dasharray: 0;
+    stroke-linejoin: miter;
+    stroke-width: 8px;
+  }
+
+  60% {
+    transform: scale(1.2);
+    fill: var(--fill);
+  }
+}
+/* Рейтинг */
+
+.theme-text {
+  color: #000;
+  transition: color 0.3s ease;
+  white-space: pre-wrap;
+  text-decoration: none;
+}
+
+html.dark-theme .theme-text {
+  color: #d0d0d0;
+}
+
+.username-display {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.username-display a {
+  color: #000;
+  text-decoration: none;
+}
+
+html.dark-theme .username-display a {
+  color: white;
+}
+
+body, html {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(135deg, #ACB6E5);
+  color: #000;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-theme {
+  background-color: #000;
+  color: #fff;
+}
+
+html.dark-theme body, html {
+  background: linear-gradient(135deg, #243B55);
+  color: #fff;
+}
+
+html.dark-theme .container {
+  background-color: #121212;
+  color: #fff;
+}
+
+/* Кнопка меню */
+.styled-button {
+  position: fixed;
+  right: 10px;
+  bottom: 10px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #00caf3, #66b2ed);
+  color: #5f2eea;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.styled-button span {
+  color: #8b5cf6;
+  text-decoration: underline;
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+    margin-top: 6px;
+}
+
+.switch {
+    font-size: 17px;
+    display: inline-block;
+    width: 3.5em;
+    height: 2em;
+    position: relative;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    --background: #28096b;
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: var(--background);
+    transition: 0.5s;
+    border-radius: 30px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 1.4em;
+    width: 1.4em;
+    border-radius: 50%;
+    left: 10%;
+    bottom: 15%;
+    box-shadow: inset 8px -4px 0px 0px #fff000;
+    background: var(--background);
+    transition: 0.5s;
+}
+
+input:checked + .slider {
+    background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+    transform: translateX(100%);
+    box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+</style>
+
+<script>
+function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+}
+
+// Переключение темы
+document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+        html.classList.add("dark-theme");
+        toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+        html.classList.toggle("dark-theme", this.checked);
+        localStorage.setItem("darkTheme", this.checked);
+    });
+});
+
+// Предпросмотр аватарки 
+const avatarInput = document.getElementById('avatarInput');
+const avatarPreview = document.getElementById('avatarPreview');
+
+avatarInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            avatarPreview.src = reader.result;
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Предпросмотр фона
+const backgroundInput = document.getElementById('backgroundInput');
+const backgroundPreview = document.getElementById('backgroundPreview');
+const selectedBackgroundInput = document.getElementById('selectedBackgroundInput');
+
+backgroundInput.addEventListener('change', function () {
+    const file = this.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function () {
+            backgroundPreview.src = reader.result;
+            selectedBackgroundInput.value = "";  // сброс мини-фона
+        };
+        reader.readAsDataURL(file);
+    }
+});
+
+// Окно выбора мини-фона
+const modal = document.getElementById("backgroundModal");
+const btn = document.getElementById("select_background");
+const span = modal.querySelector(".close");
+const thumbs = modal.querySelectorAll(".bg-thumb");
+
+// Открытие окна
+btn.onclick = () => modal.style.display = "flex";
+
+// Закрытие окна по кнопке
+span.onclick = () => modal.style.display = "none";
+
+// Закрытие окна по клику вне содержимого
+window.onclick = (event) => { if (event.target === modal) modal.style.display = "none"; };
+
+// Выбор мини-фона
+thumbs.forEach(img => {
+    img.addEventListener("click", function() {
+        backgroundPreview.src = this.src; 
+        selectedBackgroundInput.value = this.src;
+        backgroundInput.value = "";  
+        modal.style.display = "none";
+    });
+});
+</script>
+{% endblock %}
+ 

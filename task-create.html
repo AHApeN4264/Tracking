@@ -1,0 +1,156 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>Створення завдання</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+  <link rel="stylesheet" href="{% static 'css/room-for-sell.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="menu-button-wrapper">
+  {% if user.username %}
+    <div id="menu" class="styled-button" onclick="redirectToMenu()">
+      🔥 <span>Меню</span> 🔥
+    </div>
+  {% else %}
+    <div id="menu" class="styled-button" onclick="redirectToMenuNone()">
+      🔥 <span>Меню</span> 🔥
+    </div>
+  {% endif %}
+</div>
+
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background rooms-wiew">
+  <div class="container">
+    <form method="post" action="/task-create/{{ user.id }}" enctype="multipart/form-data" class="form">
+      {% csrf_token %}
+      <h1>Створення завдання</h1>
+
+      {% if messages %}
+        {% for message in messages %}
+          <p class="{% if 'success' in message.tags %}message{% elif 'error' in message.tags %}error-msg{% else %}info-msg{% endif %}">
+            {{ message }}
+          </p>
+        {% endfor %}
+      {% endif %}
+
+      <label>Назва:
+        <input type="text" name="title" required>
+      </label>
+
+      <label>Описання:
+        <textarea name="description" rows="4" cols="40" required style="resize: vertical;"></textarea>
+      </label>
+
+      <label>Приоритет:
+        <select name="priority" required>
+          <option value="low">Low</option>
+          <option value="medium">Medium</option>
+          <option value="high">High</option>
+        </select>
+      </label>
+
+      <label>Термін виконання:
+        <input type="datetime-local" name="deadline" id="end_date"
+          value="{{ now_str }}"
+          min="{{ now_str }}"
+          required>
+      </label>
+
+      <label>Завдання:
+        <textarea name="tasks" rows="4" cols="40" required style="resize: vertical;"></textarea>
+      </label>
+
+      <label>Правильна відповідь:
+        <textarea name="correct_answer" rows="4" cols="40" required style="resize: vertical;">{{ task.correct_answer }}</textarea>
+      </label>
+
+      <label>Підписка:
+        <select name="subscription" required>
+          <option value="Не потрібна" {% if task.subscription == 'Не потрібна' %}selected{% endif %}>Не потрібна</option>
+          <option value="Потрібна" {% if task.subscription == 'Потрібна' %}selected{% endif %}>Потрібна</option>
+        </select>
+      </label>
+
+      <label>Активність:
+        <select name="activity_status" required>
+          <option value="active" {% if task.status == 'active' %}selected{% endif %}>Активно</option>
+          <option value="inactive" {% if task.status == 'inactive' %}selected{% endif %}>Неактивно</option>
+        </select>
+      </label>
+
+      <label>Статус завдання:
+        <select name="task_status" required>
+          <option value="active" {% if task.status == 'active' %}selected{% endif %}>Відкрито</option>
+          <option value="inactive" {% if task.status == 'inactive' %}selected{% endif %}>Приховати</option>
+        </select>
+      </label>
+      <button type="submit" class="btn">Створити завдання</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const startDateInput = document.getElementById('start_date');
+  const endDateInput = document.getElementById('end_date');
+
+  function getDayWord(days) {
+    if (days === 1) return 'день';
+    if (days >= 2 && days <= 4) return 'дні';
+    return 'днів';
+  }
+</script>
+
+<style>
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(135deg, #703400, #ACB6E5);
+  color: #000;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+
+  function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+  }
+
+  function redirectToMenuNone() {
+    window.location.href = "/menu/none";
+  }
+</script>
+{% endblock %}

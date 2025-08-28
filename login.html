@@ -1,0 +1,113 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Вхід до акаунту</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/login.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    <a href="/login" class="login-link">👤 Ви не увійшли в акаунт</a>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background">
+    <div class="container">
+        <form method="post" action="{% url 'login' %}" class="form">
+            {% csrf_token %}
+            <h2>Вхід до акаунту</h2>
+            {% if messages %}
+                {% for message in messages %}
+                    <p class="{% if message.tags == 'success' %}message{% else %}error-msg{% endif %}">
+                      {{ message }}
+                    </p>
+                {% endfor %}
+            {% endif %}
+            <label>Ім’я користувача:
+                <input type="text" name="username" required>
+            </label>
+            
+            <label>Номер телефону:
+                <input type="text" name="phone_number" required>
+            </label>
+
+            <label>Email:
+                <input type="email" name="email" required>
+            </label>
+            
+            <label>Пароль:
+                <input type="password" name="password" required>
+            </label>
+
+            <button type="submit">Увійти</button>
+        </form>
+
+        <div class="bottom-link">
+            <p>Немає акаунта?</p>
+            <a href="{% url 'register' %}" class="register-button">Створити акаунт</a>
+        </div>
+
+        <div class="bottom-link">
+            <p>Хочеш видалити акаунт?</p>
+            <a href="{% url 'register-delete' %}" class="register-button">Видалити акаунт</a>
+        </div>
+    </div>
+</div>
+
+<div class="username-display">
+  {% if user.username %}
+    <div id="menu" class="styled-button" onclick="redirectToMenu()">
+      🔥
+      <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span>
+      🔥
+    </div>
+  {% else %}
+    <div id="menu" class="styled-button" onclick="redirectToMenuNone()">
+      🔥
+      <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span>
+      🔥
+    </div>
+  {% endif %}
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+
+<script>
+  function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+  }
+
+  function redirectToMenuNone() {
+    window.location.href = "/menu/none";
+  }
+</script>
+{% endblock %}

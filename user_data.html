@@ -1,0 +1,86 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Інформація про користувача</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/user_data.css' %}">
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background" style="padding: 40px; display: flex; justify-content: center;">
+  <div class="profile-container">
+    <h2>Профіль користувача</h2>
+    <p><strong>Імʼя:</strong> {{ user.username }}</p>
+    <p><strong>Телефон:</strong> {{ user.phone_number }}</p>
+    <p><strong>Email:</strong> {{ user.email }}</p>
+    <p><strong>Роль:</strong> {{ user.role }}</p>
+    {% if user.subscription != 'Нема підписки' %}
+      <p><strong>Закінчення підписки:</strong> {{ user.subscription_end }}</p>
+    {% else %}
+      <p><strong>Підписка:</strong> Немає активної підписки</p>
+    {% endif %}
+    <p><strong>Створено завдань:</strong> {{ total_created }}</p>
+    <p><strong>Виконанних завдань:</strong> {{ total_completed }}</p>
+    <!-- <p><strong>Загальна кількість балів:</strong> {{ total_points }}</p> -->
+  </div>
+</div>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥
+  <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span>
+  🔥
+</div>
+
+<style>
+html{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #1bb380, #2aca0a);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+</style>
+
+<script>
+    function redirectToMenu() {
+        window.location.href = "/menu/{{ user.id }}";
+    }
+</script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+{% endblock %}

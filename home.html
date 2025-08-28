@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Django Project</title>
+</head>
+<body>
+    <h1>Welcome to My Django Project</h1>
+    <p>This is a simple Django application.</p>
+    <ul>
+        <li><a href="/about" style="color: rgb(0, 0, 255); text-decoration: none;">Нажми сдесь</a>
+        <li><a href="{% url 'about' %}">About</a></li>
+        <li><a href="{% url 'contact' %}">Contact</a></li>
+    </ul>
+</body>
+</html>

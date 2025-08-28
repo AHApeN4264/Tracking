@@ -1,0 +1,466 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>Оновити інформацію про кімнату</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+    <link rel="stylesheet" href="{% static 'css/update-room.css' %}">
+{% endblock %}
+
+{% block body %}
+
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background">
+  <div style="margin-top: 0px;">
+    <div class="container">
+      <form method="post" action="{% url 'update_task' user.id task.id %}" enctype="multipart/form-data" class="form">
+        {% csrf_token %}
+        <h1>Оновити інформацію про завдання</h1>
+        {% if messages %}
+          {% for message in messages %}
+            <p class="
+              {% if 'success' in message.tags %} message
+              {% elif 'error' in message.tags %} error-msg
+              {% else %} info-msg
+              {% endif %}">
+              {{ message }}
+            </p>
+          {% endfor %}
+        {% endif %}
+        <label class="label-text">Назва:
+            <input type="text" name="title" value="{{ task.title }}" required>
+        </label>
+        <label>Описання:
+          <textarea name="description" rows="4" cols="40" required style="resize: vertical;">{{ task.description }}</textarea>
+        </label>
+        <label>Приоритет:
+          <select name="priority" required>
+            <option value="low" {% if task.priority == 'low' %}selected{% endif %}>Low</option>
+            <option value="medium" {% if task.priority == 'medium' %}selected{% endif %}>Medium</option>
+            <option value="high" {% if task.priority == 'high' %}selected{% endif %}>High</option>
+          </select>
+        </label>
+        <label>Термін виконання:
+        <input type="datetime-local" name="deadline" id="end_date" 
+          value="{{ task.deadline|date:'Y-m-d H:i' }}"
+          required>
+        </label>
+        <label>Завдання:
+          <textarea name="tasks" rows="4" cols="40" required style="resize: vertical;">{{ task.tasks }}</textarea>
+        </label>
+        <label>Правильна відповідь:
+          <textarea name="correct_answer" rows="4" cols="40" required style="resize: vertical;">{{ task.correct_answer }}</textarea>
+        </label>
+        <label>Підписка:
+          <select name="subscription" required>
+            <option value="Не потрібна" {% if task.subscription == 'Не потрібна' %}selected{% endif %}>Не потрібна</option>
+            <option value="Потрібна" {% if task.subscription == 'Потрібна' %}selected{% endif %}>Потрібна</option>
+          </select>
+        </label>
+        <label>Активність:
+          <select name="activity_status" required>
+            <option value="active" {% if task.status == 'active' %}selected{% endif %}>Активно</option>
+            <option value="inactive" {% if task.status == 'inactive' %}selected{% endif %}>Неактивно</option>
+          </select>
+        </label>
+        <label>Статус завдання:
+          <select name="task_status" required>
+            <option value="active" {% if task.status == 'active' %}selected{% endif %}>Відкрито</option>
+            <option value="inactive" {% if task.status == 'inactive' %}selected{% endif %}>Приховати</option>
+          </select>
+        </label>
+        <button type="submit" class="btn">Зберегти зміни</button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Arial, sans-serif;
+}
+
+html, body {
+  height: 100%;
+  margin: 0;
+  background: linear-gradient(135deg, #7420a9, #a62020);
+  color: #000;
+  font-family: Arial, sans-serif;
+  transition: background-color 0.3s, color 0.3s;
+}
+
+html.dark-theme {
+  background: linear-gradient(135deg, #000000, #0d1a33);
+  color: white;
+}
+
+.username-display {
+  position: absolute;
+  top: 10px;
+  right: 20px;
+  font-weight: bold;
+  font-size: 16px;
+  color: #333;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.username-display a {
+  color: #000;
+  text-decoration: none;
+}
+
+/* Переключатель темы */
+.switch-wrapper {
+  margin-top: 6px;
+}
+.switch {
+  font-size: 17px;
+  display: inline-block;
+  width: 3.5em;
+  height: 2em;
+  position: relative;
+}
+
+.switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.slider {
+  --background: #28096b;
+  position: absolute;
+  cursor: pointer;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background-color: var(--background);
+  transition: .5s;
+  border-radius: 30px;
+}
+
+.slider:before {
+  position: absolute;
+  content: "";
+  height: 1.4em;
+  width: 1.4em;
+  border-radius: 50%;
+  left: 10%;
+  bottom: 15%;
+  box-shadow: inset 8px -4px 0px 0px #fff000;
+  background: var(--background);
+  transition: .5s;
+}
+
+input:checked + .slider {
+  background-color: #522ba7;
+}
+
+input:checked + .slider:before {
+  transform: translateX(100%);
+  box-shadow: inset 15px -4px 0px 15px #fff000;
+}
+
+/* */
+.menu-button-wrapper {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  z-index: 1000;
+}
+
+/* Кнопка "Меню" */
+.styled-button {
+    position: fixed;
+    left: 10px;
+    top: 10px;
+    z-index: 1000;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: linear-gradient(90deg, #00caf3, #66b2ed);
+    color: #5f2eea;
+    font-size: 16px;
+    font-weight: bold;
+    padding: 10px 20px;
+    border: none;
+    border-radius: 20px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+    cursor: pointer;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.styled-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 10px rgba(0,0,0,0.15);
+}
+
+.styled-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+
+.container {
+  background-color: white;
+  padding: 30px 40px;
+  border-radius: 12px;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.container input,
+.container select,
+.container textarea {
+  background-color: #fdfdfd;
+  color: #000;
+  border: 1px solid #ccc;
+  border-radius: 6px;
+  padding: 8px 10px;
+  transition: background-color 0.3s, color 0.3s;
+  font-size: 14px;
+}
+
+.container input::placeholder,
+.container textarea::placeholder {
+  color: #666;
+}
+
+.container input:focus,
+.container textarea:focus {
+  background-color: #fff;
+  border-color: #888;
+  outline: none;
+  color: #000;
+}
+
+.container button.btn {
+  background-color: #00aaff;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 20px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  font-size: 16px;
+  font-weight: bold;
+}
+
+.container button.btn:hover {
+  background-color: #008fcc;
+}
+
+/* Тёмная тема */
+html.dark-theme {
+  background: linear-gradient(135deg, #141E30, #243B55);
+  color: white;
+}
+
+html.dark-theme body {
+  background: transparent;
+  color: white;
+}
+
+html.dark-theme .username-display a {
+  color: white;
+}
+
+html.dark-theme .rooms-wiew {
+  color: white;
+}
+
+html.dark-theme .rooms-wiew a {
+  color: white;
+}
+
+/* Тёмная тема - container и форма */
+html.dark-theme .container {
+  background-color: #121212;
+  color: white;
+  box-shadow: 0 0 15px rgba(255, 255, 255, 0.1);
+}
+
+html.dark-theme .container input,
+html.dark-theme .container select,
+html.dark-theme .container textarea {
+  background-color: #222;
+  color: white;
+  /* border: 1px solid #555; */
+  /* border-radius: 6px; */
+  /* padding: 8px 10px; */
+  /* font-size: 14px; */
+}
+
+html.dark-theme .container input::placeholder,
+html.dark-theme .container textarea::placeholder {
+  color: #bbb;
+}
+
+html.dark-theme .container input:focus,
+html.dark-theme .container textarea:focus {
+  background-color: #333;
+  border-color: #888;
+  /* outline: none; */
+  color: white;
+}
+
+html.dark-theme .container button.btn {
+  background-color: #522ba7;
+  color: white;
+  /* border: none; */
+  /* padding: 10px 20px; */
+  /* border-radius: 20px; */
+  /* cursor: pointer; */
+  /* font-size: 16px; */
+  /* font-weight: bold; */
+}
+
+html.dark-theme .container button.btn:hover {
+  background-color: #6a40d1;
+}
+
+.background {
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.form h2 {
+    margin-bottom: 20px;
+    text-align: center;
+}
+
+label {
+    display: block;
+    margin-bottom: 15px;
+    font-weight: bold;
+}
+
+input[type="text"], input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    margin-top: 5px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+button {
+    width: 100%;
+    padding: 10px;
+    background-color: #4facfe;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s ease;
+}
+
+button:hover {
+    background-color: #00f2fe;
+}
+
+.bottom-link {
+    text-align: center;
+    margin-top: 15px;
+}
+
+.register-button {
+    display: inline-block;
+    margin-top: 5px;
+    background-color: transparent;
+    border: 2px solid #4facfe;
+    color: #4facfe;
+    padding: 8px 15px;
+    border-radius: 6px;
+    text-decoration: none;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+
+.register-button:hover {
+    background-color: #4facfe;
+    color: white;
+}
+
+.button-link {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: #007bff;
+    color: white;
+    text-decoration: none;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    cursor: pointer;
+    text-align: center;
+}
+.button-link:hover {
+    background-color: #0056b3;
+}
+.readonly-field {
+    padding: 5px 10px;
+    background-color: #f1f1f1;
+    border-radius: 4px;
+    font-family: monospace;
+}
+
+.message {
+    color: green;
+    font-weight: bold;
+}
+
+.error-msg {
+    color: red;
+    font-weight: bold;
+}
+</style>
+
+<div id="menu" class="styled-button" onclick="redirectToMenu()">
+  🔥 <span style="color: #6a5acd; text-decoration: none; font-weight: bold;">Меню</span> 🔥
+</div>
+
+<script>
+function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+}
+
+// Theme toggle
+document.addEventListener("DOMContentLoaded", function () {
+  const toggle = document.getElementById("themeToggle");
+  const html = document.documentElement;
+
+  if (localStorage.getItem("darkTheme") === "true") {
+    html.classList.add("dark-theme");
+    toggle.checked = true;
+  }
+
+  toggle.addEventListener("change", function () {
+    html.classList.toggle("dark-theme", this.checked);
+    localStorage.setItem("darkTheme", this.checked);
+  });
+});
+</script>
+
+{% endblock %}

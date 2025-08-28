@@ -1,0 +1,64 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>{{ title }}</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'css/error-continued.css' %}">
+
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    <a href="/login" class="login-link">👤 Ви не увійшли в акаунт</a>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div style="display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 60vh;">
+  <div class="container">
+    <p class="white-text1">Ви не увійшли в акаунт</p>
+    <p class="white-text2">Будь ласка, увійдіть у систему або зареєструйтесь, щоб продовжити.</p>
+    <a href="/register" class="text3">Зареєструватися</a>
+    <a href="/login" class="text4">Увійти</a>
+    <a href="/menu/none" class="back">Назад</a>
+  </div>
+</div>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+
+<script>
+  function redirectToMenu() {
+    window.location.href = "/menu/{{ user.id }}";
+  }
+
+  function redirectToMenuNone() {
+    window.location.href = "/menu/none";
+  }
+</script>
+{% endblock %}

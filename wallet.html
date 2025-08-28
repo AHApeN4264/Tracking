@@ -1,0 +1,105 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+  <title>{{ title }}</title>
+  <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+  <link rel="stylesheet" href="{% static 'css/wallet.css' %}">
+  <!-- <script src="https://cdn.tailwindcss.com"></script> -->
+{% endblock %}
+
+{% block body %}
+<div class="username-display">
+  {% if user.username %}
+    <a href="/settings" class="login-link">👤 {{ user.username }}</a>
+    <a href="/wallet" class="login-link">({{ user.wallet }})</a>
+  {% else %}
+    👤 Ви не увійшли в акаунт<br>
+    <a href="/login" class="login-link">Увійти</a>
+  {% endif %}
+  <div class="switch-wrapper">
+    <label class="switch" title="Перемкнути тему">
+      <input type="checkbox" id="themeToggle" aria-label="Theme toggle">
+      <span class="slider"></span>
+    </label>
+  </div>
+</div>
+
+<div class="background" style="padding: 40px; display: flex; justify-content: center;">
+  <div class="container">
+    <h2>{{ title }}</h2>
+      {% if messages %}
+        {% for message in messages %}
+          <p class="
+            {% if 'success' in message.tags %}message
+            {% elif 'error' in message.tags %}error-msg
+            {% else %}info-msg
+            {% endif %}
+          ">
+            {{ message }}
+          </p>
+        {% endfor %}
+      {% endif %}
+    <h3>Яку суму ви бажаєте поповнити?</h3>
+
+    <form method="post" action="{% url 'wallet' %}" style="margin-bottom: 20px;">
+      {% csrf_token %}
+      <div style="display: flex; gap: 20px;">
+        <button type="submit" name="amount" value="100" class="btn-amount">100</button>
+        <button type="submit" name="amount" value="500" class="btn-amount">500</button>
+        <button type="submit" name="amount" value="1000" class="btn-amount">1000</button>
+      </div>
+    </form>
+
+    <form method="post" action="{% url 'wallet' %}">
+      {% csrf_token %}
+      <p style="margin: 10px 0; font-weight: bold;">Інша сума:</p>
+      <input type="number" name="custom_amount" placeholder="Введіть суму" required min="1" step="0.01" style="width: 100%; padding: 10px; border-radius: 6px; border: 1px solid #ccc;">
+      <button type="submit" class=button2>
+        Поповнити
+      </button>
+    </form>
+
+    <h3 style="margin-top: 20px;">Ваш баланс: {{ user.wallet }} грн</h3>
+
+    <button type="button"
+      onclick="window.location.href='/menu/{{ user.id }}'"
+        style="margin-top: 10px; width: 100%; padding: 10px;
+          background-color: #2846a7; color: white;
+          border: none; border-radius: 6px;
+          font-weight: bold; cursor: pointer;">
+      Меню
+    </button>
+  </div>
+</div>
+
+<style>
+html{
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  background: linear-gradient(135deg, #003e96, #00ff88);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-family: Arial, sans-serif;
+}
+</style>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    const toggle = document.getElementById("themeToggle");
+    const html = document.documentElement;
+
+    if (localStorage.getItem("darkTheme") === "true") {
+      html.classList.add("dark-theme");
+      toggle.checked = true;
+    }
+
+    toggle.addEventListener("change", function () {
+      html.classList.toggle("dark-theme", this.checked);
+      localStorage.setItem("darkTheme", this.checked);
+    });
+  });
+</script>
+{% endblock %}

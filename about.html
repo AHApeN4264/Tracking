@@ -1,0 +1,79 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}
+    <title>My Django Project</title>
+    <link rel="icon" type="image/x-icon" href="{% static 'icons/icons8-brutus-32.ico' %}">
+{% endblock %}
+
+{% block body %}
+<link rel="stylesheet" href="{% static 'css/style.css' %}">
+<div>
+    <div class="fon-text">
+        <h1>Welcome to My Django Project</h1>
+        <p>This is a simple Django application.</p>
+    </div>
+
+    <div class="fon-text" style="margin-top: 50px;">
+        Django (Джанго, ['dʒæŋɡoʊ][5]) — свободный фреймворк для веб-приложений на языке Python, использующий шаблон проектирования MVC[6]. Проект поддерживается организацией Django Software Foundation.
+        Сайт на Django строится из одного или нескольких приложений, которые рекомендуется делать отчуждаемыми и подключаемыми. Это одно из существенных архитектурных отличий этого фреймворка от некоторых других (например, Ruby on Rails). Один из основных принципов фреймворка — DRY (англ. Don't repeat yourself)
+        Также, в отличие от других фреймворков, обработчики URL в Django конфигурируются явно при помощи регулярных выражений.
+        Для работы с базой данных Django использует собственный ORM, в котором модель данных описывается классами Python, и по ней генерируется схема базы данных.[7]
+    </div>
+
+    <!-- <div style="margin-top: 700px;">   -->
+        <!-- переход на другие страницы: -->
+        <!-- <ul> -->
+            <!-- <li><a href="{% url 'index' %}">index</a></li> -->
+            <!-- <li><a href="{% url 'contact' %}">Contact</a></li> -->
+        <!-- </ul> -->
+    <!-- </div> -->
+</div>
+
+<style>
+.styled-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(90deg, #086314, #37f237);
+  color: #5f2eea;
+  font-family: Arial, sans-serif;
+  font-size: 16px;
+  font-weight: bold;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  cursor: pointer;
+  text-decoration: none;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  position: absolute;
+  top: 100px;
+}
+.styled-button:hover {
+  transform: scale(1.05);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+}
+.styled-button span {
+  color: #8b5cf6;
+  text-decoration: underline;
+}
+</style>
+
+<div id="about" style="margin-top: 700px;" class="styled-button" onclick="redirectToindex()">
+    🔥<span style="color: #173fde; text-decoration: none; font-weight: bold;">index</span>🔥
+</div>
+<div>
+    <div id="contact" style="margin-top: 750px;" class="styled-button" onclick="redirectTocontact()">
+            🔥<span style="color: #173fde; text-decoration: none; font-weight: bold;">contact</span>🔥
+    </div> 
+</div>
+<script>
+    function redirectToindex() {
+        window.location.href = "/index";
+    }
+    function redirectTocontact() {
+        window.location.href = "/contact";
+    }
+</script>
+{% endblock %}
